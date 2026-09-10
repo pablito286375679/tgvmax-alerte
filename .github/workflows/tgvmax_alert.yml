@@ -1,0 +1,41 @@
+name: Vigie TGV Max Jeune 24/7 (5 min)
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  check-tgvmax:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Vérifier les trains et envoyer les alertes
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          RECIPIENT_EMAIL: ${{ secrets.RECIPIENT_EMAIL }}
+          ROUTES_JSON: ${{ secrets.ROUTES_JSON }}
+        run: |
+          python tgvmax_alert.py --once
+
+      - name: Mémoriser les trains vus (anti-doublon)
+        run: |
+          git config --global user.name "TGV Max Bot"
+          git config --global user.email "bot@tgvmax.internal"
+          git add tgvmax_seen_trains.json || true
+          if git diff --staged --quiet; then
+            echo "Aucun nouveau train à sauvegarder."
+          else
+            git commit -m "Mise à jour du cache [skip ci]"
+            git push
+          fi
