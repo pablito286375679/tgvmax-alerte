@@ -48,6 +48,7 @@
       }
     }
   </script>
+
   <style>
     :root {
       --sat: env(safe-area-inset-top, 0px);
@@ -83,56 +84,60 @@
     }
     .card-train-hover:hover {
       border-color: rgba(255, 42, 133, 0.5);
-      transform: translateY(-2px);
+    }
+    /* Rendre les icônes natives de calendrier et d'horloge 100% BLANCHES */
+    input[type="date"],
+    input[type="time"] {
+      color-scheme: dark;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator,
+    input[type="time"]::-webkit-calendar-picker-indicator {
+      filter: brightness(0) invert(1) !important;
+      opacity: 1 !important;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      transition: transform 0.2s;
+    }
+    input[type="date"]::-webkit-calendar-picker-indicator:hover,
+    input[type="time"]::-webkit-calendar-picker-indicator:hover {
+      transform: scale(1.15);
     }
   </style>
 </head>
 <body class="h-full flex flex-col font-sans bg-[#060c1e] text-slate-100 antialiased selection:bg-tgv-500 selection:text-white">
 
-  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full px-4 sm:px-0"></div>
-
-  <!-- Écran de Verrouillage par Mot de passe -->
-  <div id="lock-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-[#060c1e]/95 backdrop-blur-2xl transition-all duration-500 p-4">
-    <div class="glass-navy max-w-md w-full rounded-3xl p-7 text-center shadow-2xl relative overflow-hidden border border-navy-700">
-      <div class="absolute -top-24 -left-24 w-48 h-48 bg-tgv-500/25 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-blue-600/25 rounded-full blur-3xl pointer-events-none"></div>
-
-      <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-tgv-500 to-indigo-600 text-white shadow-xl shadow-tgv-500/30 mb-5 ring-4 ring-tgv-500/20">
-        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-        </svg>
+  <div id="lock-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-[#060c1e] p-4 transition-opacity duration-300">
+    <div class="glass-navy max-w-sm w-full rounded-3xl p-7 border-2 border-navy-700/80 shadow-2xl text-center space-y-6">
+      <div class="w-14 h-14 mx-auto rounded-3xl bg-gradient-to-tr from-tgv-500 to-indigo-600 flex items-center justify-center text-white text-2xl shadow-xl shadow-tgv-500/30">
+        ⚡
       </div>
 
-      <h1 class="text-2xl font-black tracking-tight text-white mb-1.5">Espace TGV Max</h1>
-      <p class="text-xs font-bold text-slate-400 mb-6">Accès sécurisé à vos alertes et surveillances de places.</p>
+      <div class="space-y-1.5">
+        <h2 class="text-xl font-black text-white tracking-tight">Accès Sécurisé</h2>
+        <p class="text-xs font-semibold text-slate-400">Entrez votre mot de passe pour accéder à la vigie TGV Max</p>
+      </div>
 
       <form id="lock-form" class="space-y-4">
-        <div class="text-left">
-          <label class="block text-[11px] font-black text-slate-300 mb-1.5 uppercase tracking-wider">Mot de passe de protection</label>
-          <div class="relative">
-            <input type="password" id="password-input" 
-                   placeholder="Code secret" 
-                   value="tgvadminmax"
-                   class="w-full bg-navy-900 border border-navy-700 focus:border-tgv-500 focus:ring-2 focus:ring-tgv-500/20 rounded-2xl px-4 py-3.5 text-white placeholder-slate-500 text-sm font-bold transition outline-none" 
-                   autofocus />
-            <button type="button" id="toggle-pwd-btn" class="absolute right-3.5 top-3.5 text-slate-400 hover:text-white" title="Afficher/Masquer">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-            </button>
-          </div>
+        <div>
+          <input type="password" id="lock-password-input" required autocomplete="current-password"
+                 placeholder="Mot de passe"
+                 class="w-full bg-navy-900 border-2 border-navy-700 focus:border-tgv-500 rounded-2xl px-4 py-3.5 text-center text-white placeholder-slate-500 text-sm font-bold tracking-widest outline-none transition" />
         </div>
 
-        <button type="submit" id="btn-unlock-submit" class="w-full py-3.5 px-4 bg-gradient-to-r from-tgv-500 to-rose-600 hover:from-tgv-400 hover:to-rose-500 text-white font-black text-sm rounded-2xl shadow-xl shadow-tgv-500/30 transition-all active:scale-95 flex items-center justify-center gap-2">
-          <span>Déverrouiller</span>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        <div id="lock-error-msg" class="hidden text-xs font-bold text-rose-400 bg-rose-500/10 border border-rose-500/20 py-2 px-3 rounded-xl">
+          Mot de passe incorrect
+        </div>
+
+        <button type="submit"
+                class="w-full py-3.5 px-6 bg-gradient-to-r from-tgv-500 to-rose-600 hover:from-tgv-400 hover:to-rose-500 text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-tgv-500/30 transition active:scale-98">
+          Accéder à l'application
         </button>
       </form>
-
-      <div class="mt-6 pt-4 border-t border-navy-800 text-xs font-semibold text-slate-400 flex items-center justify-between">
-        <span>Par défaut : <button type="button" id="btn-autofill-pwd" class="text-tgv-400 font-mono font-black underline cursor-pointer">tgvadminmax</button></span>
-        <button id="reset-pwd-hint" class="hover:text-tgv-400 transition underline font-bold">Modifier</button>
-      </div>
     </div>
   </div>
+
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none max-w-sm w-full px-4 sm:px-0"></div>
 
   <header class="border-b border-navy-800/80 bg-navy-950/80 backdrop-blur-xl sticky top-0 z-30">
     <div class="max-w-5xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between">
@@ -153,23 +158,18 @@
       </div>
 
       <div class="flex items-center gap-2">
-        <!-- Bouton Burger 3 traits purs -->
-        <button id="btn-burger-menu" class="relative w-10 h-10 rounded-2xl bg-navy-850 hover:bg-navy-750 active:bg-navy-700 border border-navy-700 flex items-center justify-center text-white transition shadow-sm" title="Menu et outils" aria-label="Menu">
-          <svg class="w-5 h-5 text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
-          </svg>
-          <span id="burger-count-badge" class="absolute -top-1.5 -right-1.5 min-w-[19px] h-[19px] px-1 rounded-full text-[10px] font-black bg-tgv-500 text-white flex items-center justify-center border-2 border-navy-950">0</span>
-        </button>
-
         <!-- Bouton Stratège IA -->
         <button id="btn-open-ai-strategist" class="h-10 text-xs font-black text-amber-300 hover:text-amber-200 px-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 hover:bg-amber-500/20 flex items-center gap-1.5 transition shadow-sm" title="Conseiller Stratégique TGV Max">
           <span>✨</span>
           <span class="hidden sm:inline">Stratège IA</span>
         </button>
 
-        <!-- Bouton Verrouillage -->
-        <button id="btn-lock" class="w-10 h-10 rounded-2xl bg-navy-850 hover:bg-navy-750 border border-navy-700 flex items-center justify-center text-slate-400 hover:text-white transition shadow-sm" title="Verrouiller la session">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        <!-- Bouton Burger 3 traits purs -->
+        <button id="btn-burger-menu" class="relative w-10 h-10 rounded-2xl bg-navy-850 hover:bg-navy-750 active:bg-navy-700 border border-navy-700 flex items-center justify-center text-white transition shadow-sm" title="Menu et outils" aria-label="Menu">
+          <svg class="w-5 h-5 text-slate-100" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <span id="burger-count-badge" class="absolute -top-1.5 -right-1.5 min-w-[19px] h-[19px] px-1 rounded-full text-[10px] font-black bg-tgv-500 text-white flex items-center justify-center border-2 border-navy-950">0</span>
         </button>
       </div>
 
@@ -288,7 +288,6 @@
                 <div class="text-tgv-400 font-bold">Objet: 🚨 [TEST TGV MAX] Place disponible : Angers ➔ Paris (0 €)</div>
                 <div class="text-slate-500">Expéditeur: Alertes TGV Max</div>
                 <div class="text-emerald-400">Place confirmée : TGV INOUI n°8812 (07:14 ➔ 08:48)</div>
-                <div class="text-slate-400">Lien: https://www.sncf-connect.com/app/home/shop</div>
               </div>
             </div>
 
@@ -297,21 +296,6 @@
 
         <!-- SOUS-CATÉGORIE 3 : RÉGLAGES & ASTUCES -->
         <div id="drawer-panel-settings" class="hidden space-y-4">
-          <div class="glass-navy rounded-3xl p-4 sm:p-5 border border-navy-800 space-y-3">
-            <h4 class="text-xs font-black text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-              <span>🔒</span> Sécurité de l'accès
-            </h4>
-            <div class="flex items-center justify-between p-3 rounded-2xl bg-navy-950 border border-navy-800">
-              <div>
-                <div class="text-xs font-bold text-white">Mot de passe de session</div>
-                <div class="text-[10px] text-slate-400">Protège vos alertes sur cet appareil</div>
-              </div>
-              <button type="button" id="drawer-btn-change-pwd" class="px-3 py-1.5 bg-navy-800 hover:bg-navy-750 text-tgv-400 border border-navy-700 text-xs font-black rounded-xl transition">
-                Modifier
-              </button>
-            </div>
-          </div>
-
           <div class="glass-navy rounded-3xl p-4 sm:p-5 border border-navy-800 space-y-2.5">
             <h4 class="text-xs font-black text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
               <span>💡</span> Heures clés TGV Max Jeune
@@ -344,9 +328,7 @@
 
   <main class="flex-1 max-w-4xl w-full mx-auto px-3 sm:px-6 py-6 space-y-6">
 
-    <!-- =============================================== -->
-    <!-- VUE 1 : RECHERCHE DU TRAJET & CONFIGURATION     -->
-    <!-- =============================================== -->
+    <!-- VUE 1 : RECHERCHE DU TRAJET & CONFIGURATION -->
     <div id="view-search" class="space-y-6">
       
       <div class="text-center sm:text-left space-y-1">
@@ -404,36 +386,62 @@
             <button type="button" onclick="setQuickRoute('ANGERS SAINT-LAUD', 'TOURS')" class="text-[11px] font-bold px-2.5 py-1 rounded-xl bg-navy-850 hover:bg-navy-750 text-slate-300 border border-navy-700 transition">Angers ➔ Tours</button>
           </div>
 
-          <!-- Plage de Dates (30 jours) & Horaires -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-navy-800">
             <div>
               <div class="flex items-center justify-between mb-1.5">
-                <label class="block text-[11px] font-black text-slate-400 uppercase tracking-wider">Date souhaitée (Début)</label>
+                <label class="flex items-center gap-2 text-[11px] font-black text-white uppercase tracking-wider">
+                  <svg class="w-4 h-4 text-white flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  <span>Date souhaitée (Début)</span>
+                </label>
                 <span class="text-[10px] font-black text-tgv-400 bg-tgv-500/10 px-2 py-0.5 rounded-md border border-tgv-500/20">Max 30 jours</span>
               </div>
               <input type="date" id="input-date-min" required
-                     class="w-full bg-navy-900 border-2 border-navy-700 focus:border-tgv-500 rounded-2xl px-3.5 py-3 text-white text-sm font-bold outline-none transition" />
+                     class="w-full bg-navy-900 border-2 border-navy-700 focus:border-tgv-500 rounded-2xl px-4 py-3.5 text-white text-sm font-bold outline-none transition cursor-pointer" />
             </div>
 
             <div>
               <div class="flex items-center justify-between mb-1.5">
-                <label class="block text-[11px] font-black text-slate-400 uppercase tracking-wider">Date de fin (Optionnel)</label>
-                <span class="text-[10px] font-bold text-slate-500">Jusqu'à J+30</span>
+                <label class="flex items-center gap-2 text-[11px] font-black text-white uppercase tracking-wider">
+                  <svg class="w-4 h-4 text-white flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  <span>Date de fin (Optionnel)</span>
+                </label>
+                <span class="text-[10px] font-bold text-slate-400">Jusqu'à J+30</span>
               </div>
               <input type="date" id="input-date-max"
-                     class="w-full bg-navy-900 border-2 border-navy-700 focus:border-tgv-500 rounded-2xl px-3.5 py-3 text-white text-sm font-bold outline-none transition" />
+                     class="w-full bg-navy-900 border-2 border-navy-700 focus:border-tgv-500 rounded-2xl px-4 py-3.5 text-white text-sm font-bold outline-none transition cursor-pointer" />
             </div>
 
             <div>
-              <label class="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-1.5">Départ au plus tôt</label>
+              <label class="flex items-center gap-2 text-[11px] font-black text-white uppercase tracking-wider mb-1.5">
+                <svg class="w-4 h-4 text-white flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <polyline points="12 6 12 12 16 14"></polyline>
+                </svg>
+                <span>Départ au plus tôt</span>
+              </label>
               <input type="time" id="input-time-min" value="06:00"
-                     class="w-full bg-navy-900 border-2 border-navy-700 focus:border-tgv-500 rounded-2xl px-3.5 py-3 text-white text-sm font-bold outline-none transition" />
+                     class="w-full bg-navy-900 border-2 border-navy-700 focus:border-tgv-500 rounded-2xl px-4 py-3.5 text-white text-sm font-bold outline-none transition cursor-pointer" />
             </div>
 
             <div>
-              <label class="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-1.5">Départ au plus tard</label>
+              <label class="flex items-center gap-2 text-[11px] font-black text-white uppercase tracking-wider mb-1.5">
+                <svg class="w-4 h-4 text-white flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+                <span>Départ au plus tard</span>
+              </label>
               <input type="time" id="input-time-max" value="23:00"
-                     class="w-full bg-navy-900 border-2 border-navy-700 focus:border-tgv-500 rounded-2xl px-3.5 py-3 text-white text-sm font-bold outline-none transition" />
+                     class="w-full bg-navy-900 border-2 border-navy-700 focus:border-tgv-500 rounded-2xl px-4 py-3.5 text-white text-sm font-bold outline-none transition cursor-pointer" />
             </div>
           </div>
 
@@ -462,9 +470,7 @@
       </div>
     </div>
 
-    <!-- =============================================== -->
-    <!-- VUE 2 : PAGE DÉFILANTE DES RÉSULTATS            -->
-    <!-- =============================================== -->
+    <!-- VUE 2 : PAGE DÉFILANTE DES RÉSULTATS -->
     <div id="view-results" class="hidden space-y-6">
       
       <div class="glass-navy rounded-3xl p-4 sm:p-5 border-2 border-navy-700/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -557,21 +563,6 @@
     <option value="STRASBOURG"></option>
   </datalist>
 
-  <!-- Modale Modification Mot de Passe -->
-  <div id="pwd-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-[#060c1e]/80 backdrop-blur-md hidden p-4">
-    <div class="glass-navy max-w-sm w-full rounded-3xl p-6 space-y-4 border border-navy-700">
-      <h3 class="text-base font-black text-white">Changer le mot de passe</h3>
-      <div>
-        <label class="block text-[11px] font-black text-slate-400 uppercase tracking-wider mb-1.5">Nouveau mot de passe</label>
-        <input type="password" id="new-password-input" class="w-full bg-navy-950 border border-navy-700 rounded-2xl px-3.5 py-3 text-white text-sm font-bold outline-none" />
-      </div>
-      <div class="flex gap-2">
-        <button type="button" id="cancel-pwd-modal" class="flex-1 py-2.5 rounded-xl bg-navy-800 text-slate-300 text-xs font-black">Annuler</button>
-        <button type="button" id="save-pwd-modal" class="flex-1 py-2.5 rounded-xl bg-tgv-500 text-white text-xs font-black">Enregistrer</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Modale Stratège IA -->
   <div id="ai-strategist-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-[#060c1e]/85 backdrop-blur-md hidden p-4">
     <div class="glass-navy max-w-md w-full rounded-3xl p-6 space-y-4 border border-amber-500/30">
@@ -595,6 +586,37 @@
   <script>
     const STORAGE_KEY = 'tgvmax_pwa_state_v4';
 
+    // Gestion de l'accès par mot de passe de session
+    const MASTER_PASSWORD = 'tgvadminmax';
+    const lockScreen = document.getElementById('lock-screen');
+    const lockForm = document.getElementById('lock-form');
+    const lockPasswordInput = document.getElementById('lock-password-input');
+    const lockErrorMsg = document.getElementById('lock-error-msg');
+
+    // Vérifie si la session en cours est déjà déverrouillée
+    if (sessionStorage.getItem('tgv_session_unlocked') === 'true') {
+      lockScreen?.classList.add('hidden');
+    } else {
+      lockScreen?.classList.remove('hidden');
+      setTimeout(() => lockPasswordInput?.focus(), 150);
+    }
+
+    lockForm?.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const entered = lockPasswordInput?.value || '';
+      if (entered === MASTER_PASSWORD) {
+        sessionStorage.setItem('tgv_session_unlocked', 'true');
+        lockScreen?.classList.add('opacity-0');
+        setTimeout(() => lockScreen?.classList.add('hidden'), 300);
+      } else {
+        if (lockErrorMsg) lockErrorMsg.classList.remove('hidden');
+        if (lockPasswordInput) {
+          lockPasswordInput.value = '';
+          lockPasswordInput.focus();
+        }
+      }
+    });
+
     function loadPersistedState() {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -606,8 +628,6 @@
     const savedState = loadPersistedState();
 
     const STATE = {
-      masterPassword: savedState?.masterPassword || "tgvadminmax",
-      isAuthenticated: false,
       alerts: savedState?.alerts || [],
       currentSearch: null,
       selectedDateFilter: null,
@@ -617,7 +637,6 @@
     function persistState() {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify({
-          masterPassword: STATE.masterPassword,
           alerts: STATE.alerts
         }));
       } catch (e) {}
@@ -655,79 +674,6 @@
       }, 4000);
     }
 
-    const lockScreen = document.getElementById('lock-screen');
-    const lockForm = document.getElementById('lock-form');
-    const passwordInput = document.getElementById('password-input');
-    const togglePwdBtn = document.getElementById('toggle-pwd-btn');
-    const btnLock = document.getElementById('btn-lock');
-    const btnAutofillPwd = document.getElementById('btn-autofill-pwd');
-
-    btnAutofillPwd?.addEventListener('click', () => {
-      if (passwordInput) {
-        passwordInput.value = 'tgvadminmax';
-        passwordInput.focus();
-      }
-    });
-
-    togglePwdBtn?.addEventListener('click', () => {
-      if (!passwordInput) return;
-      passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
-    });
-
-    function unlockApp() {
-      STATE.isAuthenticated = true;
-      lockScreen?.classList.add('opacity-0', 'pointer-events-none');
-      showToast("Bienvenue sur votre vigie TGV Max !", "success");
-    }
-
-    lockForm?.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const entered = passwordInput?.value.trim() || '';
-      // On accepte soit le mot de passe personnalisé, soit le mot de passe par défaut
-      if (entered === STATE.masterPassword || entered === 'tgvadminmax') {
-        unlockApp();
-      } else {
-        showToast("Mot de passe incorrect. (Par défaut: tgvadminmax)", "error");
-        passwordInput?.classList.add('ring-2', 'ring-rose-500');
-        setTimeout(() => passwordInput?.classList.remove('ring-2', 'ring-rose-500'), 1000);
-      }
-    });
-
-    btnLock?.addEventListener('click', () => {
-      STATE.isAuthenticated = false;
-      if (passwordInput) passwordInput.value = '';
-      lockScreen?.classList.remove('opacity-0', 'pointer-events-none');
-      showToast("Session verrouillée.", "info");
-    });
-
-    const resetPwdHint = document.getElementById('reset-pwd-hint');
-    const pwdModal = document.getElementById('pwd-modal');
-    const cancelPwdModal = document.getElementById('cancel-pwd-modal');
-    const savePwdModal = document.getElementById('save-pwd-modal');
-    const newPasswordInput = document.getElementById('new-password-input');
-
-    resetPwdHint?.addEventListener('click', () => {
-      pwdModal?.classList.remove('hidden');
-      if (newPasswordInput) {
-        newPasswordInput.value = '';
-        newPasswordInput.focus();
-      }
-    });
-
-    cancelPwdModal?.addEventListener('click', () => pwdModal?.classList.add('hidden'));
-
-    savePwdModal?.addEventListener('click', () => {
-      const val = newPasswordInput?.value.trim();
-      if (!val) {
-        showToast("Le mot de passe ne peut pas être vide.", "error");
-        return;
-      }
-      STATE.masterPassword = val;
-      persistState();
-      pwdModal?.classList.add('hidden');
-      showToast("Nouveau mot de passe enregistré !", "success");
-    });
-
     const btnSwap = document.getElementById('btn-swap-stations');
     const swapIcon = document.getElementById('swap-icon');
     let swapAngle = 0;
@@ -743,7 +689,6 @@
 
       swapAngle += 180;
       if (swapIcon) swapIcon.style.transform = `rotate(${swapAngle}deg)`;
-      showToast("Gares inversées !", "info");
     });
 
     window.setQuickRoute = function(orig, dest) {
@@ -751,10 +696,16 @@
       const inputDest = document.getElementById('input-destination');
       if (inputOrigin) inputOrigin.value = orig;
       if (inputDest) inputDest.value = dest;
-      showToast(`${orig} ➔ ${dest} sélectionné`, "info");
     };
 
-    // Initialisation stricte de la date du jour et de la limite à 30 jours
+    // Conversion de date locale en YYYY-MM-DD (sans décalage UTC)
+    function toLocalISODate(d) {
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
     const inputDateMin = document.getElementById('input-date-min');
     const inputDateMax = document.getElementById('input-date-max');
     
@@ -762,8 +713,8 @@
     const maxDateObj = new Date();
     maxDateObj.setDate(todayObj.getDate() + 30);
     
-    const todayIso = todayObj.toISOString().split('T')[0];
-    const maxDateIso = maxDateObj.toISOString().split('T')[0];
+    const todayIso = toLocalISODate(todayObj);
+    const maxDateIso = toLocalISODate(maxDateObj);
     
     if (inputDateMin) {
       inputDateMin.value = todayIso;
@@ -851,7 +802,7 @@
       for (let i = 0; i < 30; i++) {
         const curDate = new Date(startBase);
         curDate.setDate(startBase.getDate() + i);
-        const iso = curDate.toISOString().split('T')[0];
+        const iso = toLocalISODate(curDate);
 
         const dayName = curDate.toLocaleDateString('fr-FR', { weekday: 'short' });
         const dayNum = curDate.getDate();
@@ -959,31 +910,50 @@
       }
     });
 
+    // Règle de filtrage stricte pour exclure expressément Angoulême
     function normalizeStationQuery(stationStr) {
       let raw = (stationStr || '').trim().toUpperCase().replace(/-/g, ' ');
 
       if (raw.includes('ANGERS')) {
-        return { clause: `(origine="ANGERS SAINT LAUD" or startswith(origine, "ANGERS"))`, destClause: `(destination="ANGERS SAINT LAUD" or startswith(destination, "ANGERS"))` };
+        return { 
+          clause: `(origine = "ANGERS SAINT LAUD" or origine like "ANGERS %")`, 
+          destClause: `(destination = "ANGERS SAINT LAUD" or destination like "ANGERS %")` 
+        };
       }
       if (raw.includes('PARIS')) {
-        return { clause: `(origine="PARIS (intramuros)" or startswith(origine, "PARIS"))`, destClause: `(destination="PARIS (intramuros)" or startswith(destination, "PARIS"))` };
+        return { 
+          clause: `(origine = "PARIS (intramuros)" or origine like "PARIS %")`, 
+          destClause: `(destination = "PARIS (intramuros)" or destination like "PARIS %")` 
+        };
       }
       if (raw.includes('LILLE')) {
-        return { clause: `(startswith(origine, "LILLE") or origine="LILLE (intramuros)")`, destClause: `(startswith(destination, "LILLE") or destination="LILLE (intramuros)")` };
+        return { 
+          clause: `(origine = "LILLE (toutes gares)" or origine = "LILLE (intramuros)" or origine like "LILLE %")`, 
+          destClause: `(destination = "LILLE (toutes gares)" or destination = "LILLE (intramuros)" or destination like "LILLE %")` 
+        };
       }
-      if (raw.includes('TOURS') || raw.includes('SAINT PIERRE DES CORPS')) {
-        return { clause: `(origine="TOURS" or startswith(origine, "ST PIERRE DES CORPS") or startswith(origine, "TOURS"))`, destClause: `(destination="TOURS" or startswith(destination, "ST PIERRE DES CORPS") or startswith(destination, "TOURS"))` };
+      if (raw.includes('TOURS') || raw.includes('CORPS') || raw.includes('PIERRE')) {
+        return { 
+          clause: `(origine = "TOURS" or origine = "ST PIERRE DES CORPS" or origine like "ST PIERRE DES CORPS %" or origine like "TOURS %")`, 
+          destClause: `(destination = "TOURS" or destination = "ST PIERRE DES CORPS" or destination like "ST PIERRE DES CORPS %" or destination like "TOURS %")` 
+        };
       }
       if (raw.includes('LYON')) {
-        return { clause: `(origine="LYON (intramuros)" or startswith(origine, "LYON"))`, destClause: `(destination="LYON (intramuros)" or startswith(destination, "LYON"))` };
+        return { 
+          clause: `(origine = "LYON (intramuros)" or origine like "LYON %")`, 
+          destClause: `(destination = "LYON (intramuros)" or destination like "LYON %")` 
+        };
       }
       if (raw.includes('MARSEILLE')) {
-        return { clause: `(origine="MARSEILLE ST CHARLES" or startswith(origine, "MARSEILLE"))`, destClause: `(destination="MARSEILLE ST CHARLES" or startswith(destination, "MARSEILLE"))` };
+        return { 
+          clause: `(origine = "MARSEILLE (toutes gares)" or origine like "MARSEILLE %")`, 
+          destClause: `(destination = "MARSEILLE (toutes gares)" or destination like "MARSEILLE %")` 
+        };
       }
 
       return { 
-        clause: `(origine="${raw}" or startswith(origine, "${raw.split(' ')[0]}"))`,
-        destClause: `(destination="${raw}" or startswith(destination, "${raw.split(' ')[0]}"))`
+        clause: `origine = "${raw}"`,
+        destClause: `destination = "${raw}"`
       };
     }
 
@@ -999,58 +969,42 @@
         destNorm.destClause
       ];
 
-      const params = new URLSearchParams({
-        where: clauses.join(' AND '),
-        order_by: 'date asc, heure_depart asc',
-        limit: '100'
-      });
+      const whereCondition = clauses.join(' AND ');
+      let allResults = [];
+      let offset = 0;
+      const limit = 100;
+      let hasMore = true;
 
-      const url = `https://data.sncf.com/api/explore/v2.1/catalog/datasets/tgvmax/records?${params.toString()}`;
-
-      try {
-        const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
-        if (!response.ok) throw new Error(`HTTP: ${response.status}`);
-        const data = await response.json();
-        const results = data.results || [];
-        if (results.length > 0) return results;
-        return generateSimulatedTrains(origin, destination);
-      } catch (err) {
-        return generateSimulatedTrains(origin, destination);
-      }
-    }
-
-    function generateSimulatedTrains(orig, dest) {
-      const origDisplay = orig.replace(/\s*\(toutes gares\)/i, '').trim();
-      const destDisplay = dest.replace(/\s*\(toutes gares\)/i, '').trim();
-      const list = [];
-      const base = new Date();
-
-      for (let dayOffset = 0; dayOffset < 30; dayOffset += 2) {
-        const d = new Date(base);
-        d.setDate(base.getDate() + dayOffset);
-        const iso = d.toISOString().split('T')[0];
-
-        list.push({
-          date: iso,
-          train_no: `${8810 + dayOffset * 2}`,
-          origine: origDisplay,
-          destination: destDisplay,
-          heure_depart: "07:14",
-          heure_arrivee: "08:48",
-          od_happy_card: "OUI"
+      // Boucle de pagination pour ne perdre AUCUN train au-delà de 100 résultats
+      while (hasMore && offset < 1000) {
+        const params = new URLSearchParams({
+          where: whereCondition,
+          order_by: 'date asc, heure_depart asc',
+          limit: limit.toString(),
+          offset: offset.toString()
         });
 
-        list.push({
-          date: iso,
-          train_no: `${8842 + dayOffset * 2}`,
-          origine: origDisplay,
-          destination: destDisplay,
-          heure_depart: "14:28",
-          heure_arrivee: "16:02",
-          od_happy_card: "OUI"
-        });
+        const url = `https://data.sncf.com/api/explore/v2.1/catalog/datasets/tgvmax/records?${params.toString()}`;
+
+        try {
+          const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
+          if (!response.ok) break;
+          const data = await response.json();
+          const records = data.results || [];
+          allResults = allResults.concat(records);
+
+          if (records.length < limit) {
+            hasMore = false;
+          } else {
+            offset += limit;
+          }
+        } catch (err) {
+          console.error("Erreur API SNCF:", err);
+          break;
+        }
       }
-      return list;
+
+      return allResults;
     }
 
     async function fetchAll30DaysAvailableTrains(alertObj, targetInitialDate) {
@@ -1096,13 +1050,6 @@
 
         buildDateSelectorStrip();
         displayTrainsForSelectedDate(targetInitialDate);
-
-        if (zeroEuroTrains.length > 0) {
-          playChimeSound();
-          showToast(`🎯 ${zeroEuroTrains.length} place(s) TGV Max à 0 € détectée(s) !`, "success");
-        } else {
-          showToast("Aucune place à 0 € pour l'instant. Votre alerte reste active.", "info");
-        }
       } catch (err) {
         if (resultsContainer) {
           resultsContainer.innerHTML = `
@@ -1189,10 +1136,10 @@
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-12 items-center gap-4 py-1">
-            <div class="sm:col-span-8 flex items-center justify-between sm:justify-start sm:gap-8">
+            <div class="sm:col-span-12 flex items-center justify-between sm:justify-start sm:gap-10">
               <div>
                 <div class="text-3xl sm:text-4xl font-black text-white tracking-tight leading-none">${t.heure_depart}</div>
-                <div class="text-xs font-bold text-slate-300 truncate max-w-[140px] sm:max-w-[190px] mt-1">${originDisplay}</div>
+                <div class="text-xs font-bold text-slate-300 truncate max-w-[140px] sm:max-w-[220px] mt-1">${originDisplay}</div>
               </div>
 
               <div class="flex flex-col items-center px-2">
@@ -1205,16 +1152,8 @@
 
               <div class="text-right sm:text-left">
                 <div class="text-3xl sm:text-4xl font-black text-white tracking-tight leading-none">${t.heure_arrivee}</div>
-                <div class="text-xs font-bold text-slate-300 truncate max-w-[140px] sm:max-w-[190px] mt-1">${destDisplay}</div>
+                <div class="text-xs font-bold text-slate-300 truncate max-w-[140px] sm:max-w-[220px] mt-1">${destDisplay}</div>
               </div>
-            </div>
-
-            <div class="sm:col-span-4 flex sm:justify-end mt-3 sm:mt-0">
-              <a href="https://www.sncf-connect.com/app/home/shop" target="_blank" rel="noopener noreferrer"
-                 class="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 text-white font-black text-xs uppercase tracking-wider rounded-2xl shadow-xl shadow-emerald-500/25 flex items-center justify-center gap-2 transition text-center">
-                <span>Réserver à 0 €</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-              </a>
             </div>
           </div>
         </div>
@@ -1392,7 +1331,6 @@
     const drawerBtnTestPush = document.getElementById('drawer-btn-test-push');
     const drawerBtnTogglePreview = document.getElementById('drawer-btn-toggle-preview');
     const drawerPreviewBox = document.getElementById('drawer-preview-box');
-    const drawerBtnChangePwd = document.getElementById('drawer-btn-change-pwd');
 
     drawerBtnTogglePreview?.addEventListener('click', () => {
       drawerPreviewBox?.classList.toggle('hidden');
@@ -1440,15 +1378,6 @@
       showToast("Notification push simulée !", "success");
     });
 
-    drawerBtnChangePwd?.addEventListener('click', () => {
-      closeBurgerDrawer();
-      pwdModal?.classList.remove('hidden');
-      if (newPasswordInput) {
-        newPasswordInput.value = '';
-        newPasswordInput.focus();
-      }
-    });
-
     drawerBtnSendTestEmail?.addEventListener('click', async () => {
       const targetEmail = drawerTestEmailInput?.value.trim();
       if (!targetEmail || !targetEmail.includes('@')) {
@@ -1474,7 +1403,6 @@
           Depart: "07:14",
           Arrivee: "08:48",
           Tarif: "0 € (Place TGV Max Jeune confirmée)",
-          LienReservation: "https://www.sncf-connect.com/app/home/shop",
           Message: "Félicitations ! Si vous lisez ce message, vos alertes emails TGV Max sont prêtes et opérationnelles."
         };
 
